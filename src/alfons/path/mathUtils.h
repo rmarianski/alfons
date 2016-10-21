@@ -20,6 +20,7 @@
 #include <vector>
 #include <algorithm>
 #include <math.h>
+#include <memory.h>
 
 namespace alfons {
 static const float D2R = M_PI / 180.0;
@@ -50,9 +51,13 @@ inline float ease(float t) { return (t * t * (3 - 2 * t)); }
  * http://betterexplained.com/articles/understanding-quakes-fast-inverse-square-root/
  */
 inline float fastSqrt(float x) {
-    int i = *(int*)&x;              // store floating-point bits in integer
+    // this relies on the size of integers and floats to be the same size
+    assert(sizeof(int) == sizeof(float));
+    int i;
+    memcpy(&i, &x, sizeof(int));    // store floating-point bits in integer
     i = 0x5f3759d5 - (i >> 1);      // initial guess for Newton's method
-    float r = *(float*)&i;          // convert new bits into float
+    float r;
+    memcpy(&r, &i, sizeof(float));  // convert new bits into float
     r *= (1.5f - 0.5f * x * r * r); // One round of Newton's method
     return r * x;
 }
